@@ -4,7 +4,7 @@
 ## Introduction
 
 
-We've talked about precision, recall, ROC curves and AUC as metrics for evaluating the performance of classifiers. With this, we've seen how measuring the performance of classification algorithms is substantially different from that of regression. For example, we briefly discussed a scenario where only 2 in 1000 cases were labelled 'positive'. In such drastically imbalanced cases, even a naive classifier that simply always predicts a 'negative' label would be 99.8% accurate. Moreove, such scenarios are relatively common in areas such as medical conditions or credit card fraud. As such, there has been a lot of work and research regarding class imbalance problems and methods for tuning classification algorithms to better fit these scenarios.
+You've learned about precision, recall, ROC curves and AUC as metrics for evaluating the performance of classifiers. With this, you've seen how measuring the performance of classification algorithms is substantially different from that of regression. For example, we briefly discussed a scenario where only 2 in 1000 cases were labelled 'positive'. In such drastically imbalanced cases, even a naive classifier that simply always predicts a 'negative' label would be 99.8% accurate. Moreove, such scenarios are relatively common in areas such as medical conditions or credit card fraud. As such, there has been a lot of work and research regarding class imbalance problems and methods for tuning classification algorithms to better fit these scenarios.
 
 
 ## Objectives
@@ -258,15 +258,21 @@ plt.show()
 ![png](index_files/index_10_1.png)
 
 
-As you can see, class weight can have a significant impact! In this case, typically the heavier that we weight the positive case, the better our classifier appears to be performing.
+As you can see, class weight can have a significant impact! In this case, typically the heavier we weight the positive case, the better our classifier appears to be performing.
 
 ### Oversampling and Undersampling
-Another technique that can be used is oversampling or undersampling. This can help address class imbalance problems when one category is far more prevelant then the other. This is a common case that occurs in medicine, image classification or fraud detection. In many of these scenarios, class imbalance can cause difficulties for the learning algorithm. After all, simply predicting the majority class could yield 99%+ accuracy if the rare class occurs <1% of the time. Due to this, sampling techniques such as oversampling the minority class or undersampling the majority class can help by producing a synthetic dataset that the learning algorithm is trained on. With this, it is important to still maintain a test set from the original dataset in order to accurately judge the accuracy of the algorithm overall.
+Another technique that can be used is oversampling or undersampling. This can help address class imbalance problems when one category is far more prevalent then the other. This is a common case that occurs in medicine, image classification or fraud detection. In many of these scenarios, class imbalance can cause difficulties for the learning algorithm. After all, simply predicting the majority class could yield 99%+ accuracy if the rare class occurs <1% of the time. Due to this, sampling techniques such as oversampling the minority class or undersampling the majority class can help by producing a synthetic dataset that the learning algorithm is trained on. With this, it is important to still maintain a test set from the original dataset in order to accurately judge the accuracy of the algorithm overall.
 
-While these initial modifications will improve the performance of classification algorithms on imbalanced datasets, a more advance technique known as SMOTE has produced even better results in practice.
+Undersampling can only be used when you have a truly massive dataset and can afford to lose data points. However, even with very large data sets, you are losing potentially useful data. Oversampling can run into the issue of overfitting to certain characteristics of certain data points because there will be exact replicas of datapoints.
+
+While these initial modifications will improve the performance of classification algorithms on imbalanced datasets, a more advanced technique known as SMOTE has produced even better results in practice.
+
+
 
 #### SMOTE
-SMOTE stands for Synthetic Minority Oversampling. Here, rather then simply oversampling the minority class with replacement (which simply adds duplicate cases to the dataset), the algorithm generates new sample data by creating 'synthetic' examples that are combinations of the closest minority class cases.   
+SMOTE stands for Synthetic Minority Oversampling. Here, rather then simply oversampling the minority class with replacement (which simply adds duplicate cases to the dataset), the algorithm generates new sample data by creating 'synthetic' examples that are combinations of the closest minority class cases. You can read more about SMOTE [here](https://jair.org/index.php/jair/article/view/10302/24590). 
+
+SMOTE is generally a powerful was to deal with class imbalances, but it runs into computational issues when you have a large number of features due to the curse of dimensionality.
    
    Implementing this technique is very easy using the **imblearn** package:
 
@@ -278,22 +284,18 @@ from imblearn.over_sampling import SMOTE, ADASYN
 
 ```python
 print(y.value_counts()) #Previous original class distribution
-X_resampled, y_resampled = SMOTE().fit_sample(X, y) 
-print(pd.Series(y_resampled).value_counts()) #Preview synthetic sample class distribution
+smote = SMOTE()
+X_train_resampled, y_train_resampled = smote.fit_sample(X_train, y_train) 
+print(pd.Series(y_train_resampled).value_counts()) #Preview synthetic sample class distribution
 ```
 
     0    99773
     1      227
     Name: is_attributed, dtype: int64
-    1    99773
-    0    99773
+    1    74841
+    0    74841
     dtype: int64
 
-
-
-```python
-X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, random_state=0)
-```
 
 
 ```python
@@ -307,13 +309,13 @@ plt.figure(figsize=(10,8))
 for n, weight in enumerate(weights):
     #Fit a model
     logreg = LogisticRegression(fit_intercept = False, C = 1e12, class_weight=weight) #Starter code
-    model_log = logreg.fit(X_train, y_train)
+    model_log = logreg.fit(X_train_resampled, y_train_resampled)
     print(model_log) #Preview model params
 
     #Predict
     y_hat_test = logreg.predict(X_test)
 
-    y_score = logreg.fit(X_train, y_train).decision_function(X_test)
+    y_score = logreg.decision_function(X_test)
 
     fpr, tpr, thresholds = roc_curve(y_test, y_score)
     
@@ -338,37 +340,37 @@ plt.show()
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='ovr', n_jobs=1, penalty='l2', random_state=None,
               solver='liblinear', tol=0.0001, verbose=0, warm_start=False)
-    AUC for None: 0.854185703286638
+    AUC for None: 0.8319918413378506
     LogisticRegression(C=1000000000000.0, class_weight='balanced', dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='ovr', n_jobs=1, penalty='l2', random_state=None,
               solver='liblinear', tol=0.0001, verbose=0, warm_start=False)
-    AUC for Balanced: 0.8514318142066395
+    AUC for Balanced: 0.8319918413378506
     LogisticRegression(C=1000000000000.0, class_weight={1: 2, 0: 1}, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='ovr', n_jobs=1, penalty='l2', random_state=None,
               solver='liblinear', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 2 to 1: 0.8453791487133762
+    AUC for 2 to 1: 0.8360475788261719
     LogisticRegression(C=1000000000000.0, class_weight={1: 10, 0: 1}, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='ovr', n_jobs=1, penalty='l2', random_state=None,
               solver='liblinear', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 10 to 1: 0.7181724655164538
+    AUC for 10 to 1: 0.7165920716112533
     LogisticRegression(C=1000000000000.0, class_weight={1: 100, 0: 1}, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='ovr', n_jobs=1, penalty='l2', random_state=None,
               solver='liblinear', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 100 to 1: 0.6543720568280497
+    AUC for 100 to 1: 0.6914649021809911
     LogisticRegression(C=1000000000000.0, class_weight={1: 1000, 0: 1},
               dual=False, fit_intercept=False, intercept_scaling=1,
               max_iter=100, multi_class='ovr', n_jobs=1, penalty='l2',
               random_state=None, solver='liblinear', tol=0.0001, verbose=0,
               warm_start=False)
-    AUC for 1000 to 1: 0.7136634350341701
+    AUC for 1000 to 1: 0.7224527184530156
 
 
 
-![png](index_files/index_16_1.png)
+![png](index_files/index_15_1.png)
 
 
 Hopefully this should make sense; after synthetically resampling our data, we no longer need to lean on penalized class weights in order to improve our model tuning. Since SMOTE recreated our dataset to have a balanced number of positive and negative cases, aggressive weighting schemas such as 10:1, 100:1 or 1000:1 drastically impact our model performance; the data is effectively no longer class imbalanced, so creating the class weights effectively reintroduces the original problem. Overall, our SMOTE unweighted model appears to be the current top performer. In practice, it is up to you the modeler, to make this and other choices when comparing models. For example, you may also wish to tune other parameters in your model such as how to perform regularization.   
@@ -382,7 +384,7 @@ In addition to simply specifying how to regularize the model, you can also speci
 
 <img src="roc_regularization.png">
 
-As you can see, all of these models perform poorly regardless of the amout of regularization. 
+As you can see, all of these models perform poorly regardless of the amount of regularization. 
 
 ## Summary
 In this lesson we investigated various tuning parameters for our model, as well as dealing with class imbalance as a whole. In the upcoming lab, you'll have a chance to try and adjust these parameters yourself in order to optimize a model for predicting credit fraud.
