@@ -4,7 +4,7 @@
 ## Introduction
 
 
-You've learned about precision, recall, ROC curves and AUC as metrics for evaluating the performance of classifiers. With this, you've seen how measuring the performance of classification algorithms is substantially different from that of regression. For example, we briefly discussed a scenario where only 2 in 1000 cases were labelled 'positive'. In such drastically imbalanced cases, even a naive classifier that simply always predicts a 'negative' label would be 99.8% accurate. Moreove, such scenarios are relatively common in areas such as medical conditions or credit card fraud. As such, there has been a lot of work and research regarding class imbalance problems and methods for tuning classification algorithms to better fit these scenarios.
+You've learned about precision, recall, ROC curves and AUC as metrics for evaluating the performance of classifiers. With this, you've seen how measuring the performance of classification algorithms is substantially different from that of regression. For example, we briefly discussed a scenario where only 2 in 1000 cases were labelled 'positive'. In such drastically imbalanced cases, even a naive classifier that simply always predicts a 'negative' label would be 99.8% accurate. Moreover, such scenarios are relatively common in areas such as medical conditions or credit card fraud. As such, there has been a lot of work and research regarding class imbalance problems and methods for tuning classification algorithms to better fit these scenarios.
 
 
 ## Objectives
@@ -35,9 +35,9 @@ class_weight : dict or 'balanced', default: None
        *class_weight='balanced'*
 ```
 
-To investigate this, we'll load a dataset on Mobile App Downloads. The data represents information regarding users to a website and whether or not they downloaded the app for their phone. As you can guess, most vistors don't download the app making it an imbalanced dataset as we had been discussing.
+To investigate this, we'll load a dataset on Mobile App Downloads. The data represents information regarding users to a website and whether or not they downloaded the app for their phone. As you can guess, most visitors don't download the app making it an imbalanced dataset as we had been discussing.
 
-First, we load in the dataset and some applicable packages.
+First, load in the dataset and some applicable packages.
 
 
 ```python
@@ -342,32 +342,32 @@ plt.show()
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='warn', n_jobs=None, penalty='l2', random_state=None,
               solver='lbfgs', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 0.1: 0.7173500155717669
+    AUC for 0.1: 0.7200396844121895
     LogisticRegression(C=1000000000000.0, class_weight=None, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='warn', n_jobs=None, penalty='l2', random_state=None,
               solver='lbfgs', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 0.25: 0.7609108539934505
+    AUC for 0.25: 0.7661409622408245
     LogisticRegression(C=1000000000000.0, class_weight=None, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='warn', n_jobs=None, penalty='l2', random_state=None,
               solver='lbfgs', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 0.33: 0.775459249157709
+    AUC for 0.33: 0.7821191287360444
     LogisticRegression(C=1000000000000.0, class_weight=None, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='warn', n_jobs=None, penalty='l2', random_state=None,
               solver='lbfgs', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 0.5: 0.8042310378346751
+    AUC for 0.5: 0.8043891148630157
     LogisticRegression(C=1000000000000.0, class_weight=None, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='warn', n_jobs=None, penalty='l2', random_state=None,
               solver='lbfgs', tol=0.0001, verbose=0, warm_start=False)
-    AUC for 0.7: 0.8190018025499948
+    AUC for 0.7: 0.81773423712498
     LogisticRegression(C=1000000000000.0, class_weight=None, dual=False,
               fit_intercept=False, intercept_scaling=1, max_iter=100,
               multi_class='warn', n_jobs=None, penalty='l2', random_state=None,
               solver='lbfgs', tol=0.0001, verbose=0, warm_start=False)
-    AUC for even: 0.8322224686441237
+    AUC for even: 0.8325663451647304
 
 
 
@@ -376,14 +376,14 @@ plt.show()
 
 Hopefully this should make sense; after synthetically resampling our data, we no longer need to lean on penalized class weights in order to improve our model tuning. Since SMOTE recreated our dataset to have a balanced number of positive and negative cases, aggressive weighting schemas such as 10:1, 100:1 or 1000:1 drastically impact our model performance; the data is effectively no longer class imbalanced, so creating the class weights effectively reintroduces the original problem. Overall, our SMOTE unweighted model appears to be the current top performer. In practice, it is up to you the modeler, to make this and other choices when comparing models. For example, you may also wish to tune other parameters in your model such as how to perform regularization.   
 
-As a review, recall that regularization are penalties to a more straightforward problem of minimizing error between our model and its outputs. The most two common regularizations are the l1 lasso and l2 ridge penalties. These add additional complexity to the loss function. In scikit-learn, these can be specified when initializing your regression object as in:
+As a review, recall that regularization are penalties to a more straightforward problem of minimizing error between our model and its outputs. The two most common regularizations are the l1 lasso and l2 ridge penalties. These add additional complexity to the loss function. In scikit-learn, these can be specified when initializing your regression object as in:
 ```logreg = LogisticRegression(penalty='l1')```
 
 The default is to use an l2 penalty, so unless you specified otherwise, that's what you've been using.   
 
-In addition to simply specifying how to regularize the model, you can also specify the amount of regularization. This is controlled through the c parameter wh is class imbalance. For example, here is the ROC curve of various regularization values with no corrections for class imbalance:
+In addition to simply specifying how to regularize the model, you can also specify the amount of regularization. This is controlled through the C parameter. For example, here is the ROC curve of various regularization values with no corrections for class imbalance:
 
-<img src="roc_regularization.png">
+<img src="./images/roc_regularization.png">
 
 As you can see, all of these models perform poorly regardless of the amount of regularization. 
 
