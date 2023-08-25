@@ -397,7 +397,7 @@ The default is to use an 'l2' penalty, so unless you specified otherwise, that's
 
 In addition to simply specifying how to regularize the model, you can also specify the amount of regularization. This is controlled through the `C` parameter. For example, here is the ROC curve of various regularization values with no corrections for class imbalance:
 
-<img src="./images/roc_regularization.png">
+<img src="https://curriculum-content.s3.amazonaws.com/data-science/images/roc_regularization.png">
 
 As you can see, all of these models perform poorly regardless of the amount of regularization. 
 
